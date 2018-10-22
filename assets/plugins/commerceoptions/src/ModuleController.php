@@ -12,7 +12,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
     {
         return $this->view->render('options_list.tpl', [
             'list'   => [],
-            'custom' => $this->module->invokeTemplateEvent('OnManagerCurrencyListRender'),
+            'custom' => $this->module->invokeTemplateEvent('OnManagerCommerceOptionsRender'),
         ]);
     }
 }
