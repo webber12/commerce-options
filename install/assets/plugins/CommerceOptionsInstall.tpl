@@ -83,7 +83,7 @@ $modx->db->query("
 ");
 
 // remove installer
-$query = $modx->db->select('id', $tablePlugins, "`name` = 'CommerceOptionsInstall'");
+$query = $modx->db->select('id', $tablePlugins, "`name` = '" . $modx->event->activePlugin . "'");
 
 if ($id = $modx->db->getValue($query)) {
    $modx->db->delete($tablePlugins, "`id` = '$id'");

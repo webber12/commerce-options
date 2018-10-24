@@ -7,7 +7,7 @@
  * @category    plugin
  * @author      mnoskov
  * @version     0.1.0
- * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender
+ * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender,OnDocFormRender,OnManagerBeforeDefaultCurrencyChange
  * @internal    @installset base
 */
 
@@ -15,11 +15,16 @@ $e = &$modx->Event;
 
 switch ($e->name) {
     case 'OnInitializeCommerce': {
-        ci()->set('optionsProcessor', function($ci) {
+        ci()->set('optionsProcessor', function($ci) use ($params) {
             require_once MODX_BASE_PATH . 'assets/plugins/commerceoptions/src/CommerceOptions.php';
-            return new CommerceOptions();
+            return new CommerceOptions($params);
         });
 
+        break;
+    }
+
+    case 'OnDocFormRender': {
+        //$e->output($ci()->optionsProcessor->renderForm());
         break;
     }
 
@@ -28,6 +33,11 @@ switch ($e->name) {
             $e->setOutput(false);
         }
 
+        break;
+    }
+
+    case 'OnManagerBeforeDefaultCurrencyChange': {
+        $ci()->optionsProcessor->changeOptionsCurrency();
         break;
     }
 
