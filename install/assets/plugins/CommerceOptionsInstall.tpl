@@ -64,8 +64,10 @@ $modx->db->query("
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `product_id` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
-        `modifier` enum('add','subtract','multiply') NOT NULL DEFAULT 'add',
+        `image` text NOT NULL,
+        `modifier` enum('add','subtract','multiply','equal') NOT NULL DEFAULT 'add',
         `amount` float NOT NULL DEFAULT '0',
+        `meta` text,
         PRIMARY KEY (`id`),
         KEY `product_id` (`product_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
