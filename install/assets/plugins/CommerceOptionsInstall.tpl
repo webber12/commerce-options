@@ -63,11 +63,16 @@ $modx->db->query("
     CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_product_options') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `product_id` int(10) unsigned NOT NULL,
+        `code` varchar(32) NOT NULL,
         `title` varchar(255) NOT NULL,
         `image` text NOT NULL,
         `modifier` enum('add','subtract','multiply','equal') NOT NULL DEFAULT 'add',
         `amount` float NOT NULL DEFAULT '0',
+        `count` float unsigned NOT NULL DEFAULT '1',
         `meta` text,
+        `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+        `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+        `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`),
         KEY `product_id` (`product_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
