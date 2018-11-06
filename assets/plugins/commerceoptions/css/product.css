@@ -1,0 +1,19 @@
+.commerce-options table.table.data td { vertical-align: middle; }
+.commerce-options .option-image-preview { max-width: 80px; max-height: 50px; }
+.commerce-options .option-image-preview[src=""] { display: none; }
+.comoptions-popup .cells-wrap { margin: 0 -1rem 0 0; padding: 0; list-style: none; }
+.comoptions-popup .cells-wrap > li { margin: 0 0 1rem; padding: 0 1rem 0 0; list-style: none; display: inline-block; width: 100%; vertical-align: top; }
+.comoptions-popup .form-cell { width: 100%; }
+.comoptions-popup .title-locked { width: 2rem; position: absolute; right: 1rem; z-index: 4; cursor: pointer; }
+.comoptions-popup .title-locked input { display: none; }
+.comoptions-popup .title-locked .icon { font-size: 1.25em; padding: 0.4em; display: inline-block; line-height: 1em; }
+.comoptions-popup .title-locked .fa.fa-lock { display: none; color: #af0000; }
+.comoptions-popup .title-locked .fa.fa-unlock { color: #d6d6d6; }
+.comoptions-popup .title-locked :checked + .icon .fa-lock { display: block; }
+.comoptions-popup .title-locked :checked + .icon .fa-unlock { display: none; }
+.comoptions-popup .table.data td:first-child { padding-left: 0; }
+.comoptions-popup .table.data td:last-child { padding-right: 0; }
+.comoptions-popup .option-image { overflow: hidden; }
+.comoptions-popup .option-image .preview { float: left; width: 80px; height: 50px; background: #eee; background-position: center; background-size: contain; background-repeat: no-repeat; }
+.comoptions-popup .option-image input[type="text"] { width: calc(100% - 190px); margin: 0 5px; }
+.comoptions-popup .option-image .btn { width: 100px; }

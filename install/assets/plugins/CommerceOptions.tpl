@@ -7,7 +7,7 @@
  * @category    plugin
  * @author      mnoskov
  * @version     0.1.0
- * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender,OnDocFormRender,OnManagerBeforeDefaultCurrencyChange
+ * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender,OnDocFormRender,OnDocFormSave,OnManagerBeforeDefaultCurrencyChange,OnDocDuplicate
  * @internal    @installset base
 */
 
@@ -24,7 +24,17 @@ switch ($e->name) {
     }
 
     case 'OnDocFormRender': {
-        //$e->output($ci()->optionsProcessor->renderForm());
+        $e->output(ci()->optionsProcessor->renderForm($params));
+        break;
+    }
+
+    case 'OnDocFormSave': {
+        ci()->optionsProcessor->saveForm($params);
+        break;
+    }
+
+    case 'OnDocDuplicate': {
+        // TODO
         break;
     }
 

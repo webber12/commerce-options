@@ -47,7 +47,7 @@
                 
                 var hash = checked.sort().join('-');
                 
-                if (_co.prices[hash]) {
+                if (_co.prices[hash] && _co.prices[hash].price !== true) {
                     $price.html(_co.prices[hash].price);
                     $hidden.val(_co.prices[hash].id).removeAttr('disabled');
                 } else {
@@ -55,7 +55,7 @@
                     $hidden.val('').attr('disabled', true);
                 }
 
-                if ($available.length == $checked.length) {
+                if (_co.prices[hash] || $available.length == $checked.length) {
                     $btn.removeAttr('disabled');
                 } else {
                     $btn.attr('disabled', true);
@@ -63,6 +63,8 @@
             } else {
                 $inputs.removeAttr('disabled');
                 $btn.attr('disabled', true);
+                $price.html(defPrice);
+                $hidden.val('').attr('disabled', true);
             }
         });
 

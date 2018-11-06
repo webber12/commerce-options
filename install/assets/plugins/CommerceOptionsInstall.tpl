@@ -18,6 +18,8 @@ $tablePlugins    = $modx->getFullTablename('site_plugins');
 $tableEvents     = $modx->getFullTablename('site_plugin_events');
 
 $events = [
+    'OnManagerBeforeComerceOptionsSaving',
+    'OnManagerBeforeCommerceOptionsRender',
     'OnManagerCommerceOptionsRender',
 ];
 
@@ -63,9 +65,17 @@ $modx->db->query("
     CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_product_options') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `product_id` int(10) unsigned NOT NULL,
+        `code` varchar(32) NOT NULL,
         `title` varchar(255) NOT NULL,
-        `modifier` enum('add','subtract','multiply') NOT NULL DEFAULT 'add',
+        `title_locked` tinyint(1) unsigned NOT NULL DEFAULT '0',
+        `image` text NOT NULL,
+        `modifier` enum('add','subtract','multiply','replace') NOT NULL DEFAULT 'add',
         `amount` float NOT NULL DEFAULT '0',
+        `count` float unsigned NOT NULL DEFAULT '1',
+        `meta` text,
+        `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+        `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+        `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`),
         KEY `product_id` (`product_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -75,6 +85,7 @@ $modx->db->query("
     CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_product_option_values') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `option_id` int(10) unsigned NOT NULL,
+        `attribute_id` int(10) unsigned NOT NULL,
         `value_id` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id`),
         KEY `option_id` (`option_id`),
