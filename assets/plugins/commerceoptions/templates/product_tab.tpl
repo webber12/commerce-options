@@ -35,7 +35,7 @@
 </div>
 
 <link rel="stylesheet" type="text/css" href="../assets/plugins/commerceoptions/css/product.css">
-<script src="../assets/plugins/commerceoptions/js/jquery.autocomplete.min.js"></script>
+<script src="../assets/plugins/commerceoptions/js/common.js"></script>
 <script src="../assets/plugins/commerceoptions/js/product.js"></script>
 <script>
     var _co = {

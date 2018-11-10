@@ -7,8 +7,9 @@ class CommerceOptions
 {
     use Commerce\Module\CustomizableFieldsTrait;
 
+    public $lexicon;
+
     private $params = [];
-    private $lexicon;
     private $view;
 
     private $tableProductOptions;

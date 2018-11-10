@@ -1,0 +1,6 @@
+#attribute_form .sectionHeader { margin-left: .25rem; margin-right: .25rem; }
+.table.attribute-values td { vertical-align: middle; }
+.attribute-values .value-image { white-space: nowrap; }
+.attribute-values .value-image .preview { width: 80px; height: 50px; display: inline-block; background-color: #ddd; background-position: center; background-repeat: no-repeat; background-size: contain; vertical-align: middle; }
+.attribute-values .value-image input { width: auto; }
+.add-attribute-value { margin-top: 1rem; }
