@@ -2,14 +2,16 @@
 
 class ModuleController extends Commerce\Module\Controllers\Controller
 {
+    private $lang;
     private $table = 'commerce_options';
     private $tableValues = 'commerce_option_values';
 
     public function __construct($modx, $module)
     {
         parent::__construct($modx, $module);
+        $this->lang = ci()->optionsProcessor->lexicon->loadLang('common');
         $this->view->setPath('assets/plugins/commerceoptions/templates/');
-        $this->view->setLang(ci()->optionsProcessor->lexicon->loadLang('common'));
+        $this->view->setLang($this->lang);
         $this->table = $modx->getFullTablename($this->table);
         $this->tableValues = $modx->getFullTablename($this->tableValues);
     }
@@ -58,7 +60,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $attr = $db->getRow($query);
 
             if (empty($attr)) {
-                $this->module->sendRedirect('attr', ['error' => $this->lang['common.error.attribute_not_found']]);
+                $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
             }
 
             $values = $db->makeArray($db->select('*', $this->tableValues, "`option_id` = '$attr_id'", "`sort` ASC"));
@@ -67,8 +69,9 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $values = [];
         }
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['values'])) {
-            $values = $_POST['values'];
+        $unsavedValues = $this->module->getFormAttr(null, 'values');
+        if (!is_null($unsavedValues)) {
+            $values = $unsavedValues;
         }
 
         return $this->view->render('attribute_edit.tpl', [
@@ -88,7 +91,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $attr = $db->getRow($query);
 
             if (empty($attr)) {
-                $this->module->sendRedirect('attr', ['error' => $this->lang['common.error.attribute_not_found']]);
+                $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
             }
         } else {
             $attr = [];
@@ -109,25 +112,55 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $this->module->sendRedirectBack(['validation_errors' => $result]);
         }
 
-        $fields = [
-            'title' => $db->escape($data['title']),
-            'sort'  => intval($data['sort']),
-        ];
-
-        $exists = [];
+        $exists = $insert = $update = [];
 
         if (!empty($data['values']) && is_array($data['values'])) {
             $ids = [];
 
             foreach ($data['values'] as $value) {
+                if (empty($value['title'])) {
+                    continue;
+                }
+
                 if (!empty($value['id']) && is_numeric($value['id'])) {
                     $ids[] = $value['id'];
                 }
             }
 
-            $exists = $db->getColumn('id', $db->select('id', $this->tableValues, "`id` IN ('" . implode("', '", $ids) . "'')"));
+            $ids = "('" . implode("', '", $ids) . "')";
+
+            $exists = $db->getColumn('id', $db->select('id', $this->tableValues, "`id` IN $ids"));
             $exists = array_flip($exists);
+
+            foreach ($data['values'] as $value) {
+                if (empty($value['title'])) {
+                    continue;
+                }
+
+                $fields = [
+                    'title' => $db->escape($value['title']),
+                    'image' => $db->escape($value['image']),
+                    'sort'  => intval($value['sort']),
+                ];
+
+                if (!empty($value['id']) && is_numeric($value['id']) && isset($exists[$value['id']])) {
+                    $update[$value['id']] = $fields;
+                } else {
+                    $insert[] = $fields;
+                }
+            }
         }
+
+        $fields = [
+            'title' => $db->escape($data['title']),
+            'sort'  => intval($data['sort']),
+        ];
+
+        $this->modx->invokeEvent('OnManagerBeforeCommerceAttributeSaving', [
+            'fields' => &$fields,
+            'insert' => &$insert,
+            'update' => &$update,
+        ]);
 
         $db->query('START TRANSACTION;');
 
@@ -138,25 +171,16 @@ class ModuleController extends Commerce\Module\Controllers\Controller
                 $attr['id'] = $db->insert($fields, $this->table);
             }
 
-            if (!empty($data['values']) && is_array($data['values'])) {
-                foreach ($data['values'] as $value) {
-                    if (empty($value['title'])) {
-                        continue;
-                    }
+            if (!empty($ids)) {
+                $db->delete($this->tableValues, "`option_id` = '" . $attr['id'] . "' AND `id` NOT IN $ids");
+            }
 
-                    $fields = [
-                        'option_id' => $attr['id'],
-                        'title'     => $db->escape($value['title']),
-                        'image'     => $db->escape($value['image']),
-                        'sort'      => intval($value['sort']),
-                    ];
+            foreach ($insert as $row) {
+                $db->insert(array_merge($row, ['option_id' => $attr['id']]), $this->tableValues);
+            }
 
-                    if (!empty($value['id']) && is_numeric($value['id']) && isset($exists[$value['id']])) {
-                        $db->update($fields, $this->tableValues, "`id` = '" . $value['id'] . "'");
-                    } else {
-                        $db->insert($fields, $this->tableValues);
-                    }
-                }
+            foreach ($update as $id => $row) {
+                $db->update($row, $this->tableValues, "`id` = '$id'");
             }
         } catch (\Exception $e) {
             $db->query('ROLLBACK;');
@@ -165,7 +189,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
 
         $db->query('COMMIT;');
         $this->modx->clearCache('full');
-        $this->module->sendRedirect('attr', ['success' => $this->lang['common.attribute_saved']]);
+        $this->module->sendRedirect('options', ['success' => $this->lang['common.attribute_saved']]);
     }
 
     public function delete()
@@ -180,13 +204,13 @@ class ModuleController extends Commerce\Module\Controllers\Controller
                 if (!empty($row)) {
                     $db->delete($this->tableValues, "`option_id` = '$attr_id'");
                     $db->delete($this->table, "`id` = '$attr_id'");
-                    $this->module->sendRedirect('attr', ['success' => $this->lang['common.attribute_deleted']]);
+                    $this->module->sendRedirect('options', ['success' => $this->lang['common.attribute_deleted']]);
                 }
             } catch (\Exception $e) {
-                $this->module->sendRedirect('attr', ['error' => $e->getMessage()]);
+                $this->module->sendRedirect('options', ['error' => $e->getMessage()]);
             }
         }
 
-        $this->module->sendRedirect('attr', ['error' => $this->lang['common.error.attribute_not_found']]);
+        $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
     }
 }
