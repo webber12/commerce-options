@@ -18,7 +18,10 @@ $tablePlugins    = $modx->getFullTablename('site_plugins');
 $tableEvents     = $modx->getFullTablename('site_plugin_events');
 
 $events = [
-    'OnManagerBeforeComerceOptionsSaving',
+    'OnManagerCommerceAttributesListRender',
+    'OnManagerBeforeCommerceAttributeSaving',
+    'OnManagerCommerceAttributeRender',
+    'OnManagerBeforeCommerceOptionsSaving',
     'OnManagerBeforeCommerceOptionsRender',
     'OnManagerCommerceOptionsRender',
 ];
@@ -41,7 +44,7 @@ foreach ($events as $event) {
 }
 
 $modx->db->query("
-    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_options') . " (
+    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_attributes') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `title` varchar(255) NOT NULL,
         `sort` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -50,14 +53,14 @@ $modx->db->query("
 ");
 
 $modx->db->query("
-    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_option_values') . " (
+    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_attribute_values') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `option_id` int(10) unsigned NOT NULL,
+        `attribute_id` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
         `image` text NOT NULL,
         `sort` smallint(5) unsigned NOT NULL DEFAULT '0',
         PRIMARY KEY (`id`),
-        KEY `option_id` (`option_id`)
+        KEY `attribute_id` (`attribute_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 ");
 

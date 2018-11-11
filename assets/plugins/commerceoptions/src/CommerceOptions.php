@@ -14,8 +14,8 @@ class CommerceOptions
 
     private $tableProductOptions;
     private $tableProductOptionValues;
-    private $tableOptionValues;
-    private $tableOptions;
+    private $tableAttributeValues;
+    private $tableAttributes;
 
     public function __construct($params)
     {
@@ -24,8 +24,8 @@ class CommerceOptions
         $modx = ci()->modx;
         $this->tableProductOptions      = $modx->getFullTablename('commerce_product_options');
         $this->tableProductOptionValues = $modx->getFullTablename('commerce_product_option_values');
-        $this->tableOptionValues        = $modx->getFullTablename('commerce_option_values');
-        $this->tableOptions             = $modx->getFullTablename('commerce_options');
+        $this->tableAttributeValues     = $modx->getFullTablename('commerce_attribute_values');
+        $this->tableAttributes          = $modx->getFullTablename('commerce_attributes');
 
         $this->lexicon = new Lexicon($modx, [
             'langDir' => 'assets/plugins/commerceoptions/lang/',
@@ -107,28 +107,28 @@ class CommerceOptions
         $modx = ci()->modx;
 
         $query = $modx->db->query("
-            SELECT po.*, ov.option_id, o.title AS option_title, pov.value_id, ov.title AS value_title, ov.image AS value_image
+            SELECT po.*, av.attribute_id, a.title AS option_title, pov.value_id, av.title AS value_title, av.image AS value_image
             FROM {$this->tableProductOptions} po
             JOIN {$this->tableProductOptionValues} pov ON pov.option_id = po.id
-            JOIN {$this->tableOptionValues} ov ON pov.value_id = ov.id
-            JOIN {$this->tableOptions} o ON ov.option_id = o.id
+            JOIN {$this->tableAttributeValues} av ON pov.value_id = av.id
+            JOIN {$this->tableAttributes} a ON av.attribute_id = a.id
             WHERE po.product_id = '" . $params['docid'] . "'
-            ORDER BY o.sort, ov.sort
+            ORDER BY a.sort, av.sort
         ");
 
         $options = [];
         $sets = [];
 
         while ($row = $modx->db->getRow($query)) {
-            if (!isset($options[$row['option_id']])) {
-                $options[$row['option_id']] = [
-                    'id'     => $row['option_id'],
+            if (!isset($options[$row['attribute_id']])) {
+                $options[$row['attribute_id']] = [
+                    'id'     => $row['attribute_id'],
                     'title'  => $row['option_title'],
                     'values' => [],
                 ];
             }
 
-            $options[$row['option_id']]['values'][$row['value_id']] = [
+            $options[$row['attribute_id']]['values'][$row['value_id']] = [
                 'id'    => $row['value_id'],
                 'title' => $row['value_title'],
                 'image' => $row['value_image'],
@@ -231,24 +231,24 @@ class CommerceOptions
             $this->attributes = ci()->cache->getOrCreate('comoptions_attributes', function() {
                 $db = ci()->db;
                 $result = [];
-                $query = $db->select('*', $this->tableOptions, null, "sort ASC");
+                $query = $db->select('*', $this->tableAttributes, null, "sort ASC");
 
                 while ($row = $db->getRow($query)) {
                     $result[$row['id']] = $row;
                 }
 
-                $query = $db->select('*', $this->tableOptionValues, null, "sort ASC");
+                $query = $db->select('*', $this->tableAttributeValues, null, "sort ASC");
 
                 while ($row = $db->getRow($query)) {
-                    if (!isset($result[$row['option_id']])) {
+                    if (!isset($result[$row['attribute_id']])) {
                         continue;
                     }
 
-                    if (!isset($result[$row['option_id']]['values'])) {
-                        $result[$row['option_id']]['values'] = [];
+                    if (!isset($result[$row['attribute_id']]['values'])) {
+                        $result[$row['attribute_id']]['values'] = [];
                     }
 
-                    $result[$row['option_id']]['values'][$row['id']] = $row;
+                    $result[$row['attribute_id']]['values'][$row['id']] = $row;
                 }
 
                 return $result;
@@ -266,7 +266,7 @@ class CommerceOptions
         if (!empty($_POST['comoptions']) && is_array($_POST['comoptions'])) {
             $data = $_POST['comoptions'];
 
-            ci()->modx->invokeEvent('OnManagerBeforeComerceOptionsSaving', [
+            ci()->modx->invokeEvent('OnManagerBeforeCommerceOptionsSaving', [
                 'data' => &$data,
             ]);
 

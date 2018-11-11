@@ -3,8 +3,8 @@
 class ModuleController extends Commerce\Module\Controllers\Controller
 {
     private $lang;
-    private $table = 'commerce_options';
-    private $tableValues = 'commerce_option_values';
+    private $table = 'commerce_attributes';
+    private $tableValues = 'commerce_attribute_values';
 
     public function __construct($modx, $module)
     {
@@ -30,7 +30,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
     {
         $list = $this->modx->runSnippet('DocLister', [
             'controller'      => 'onetable',
-            'table'           => 'commerce_options',
+            'table'           => 'commerce_attributes',
             'idType'          => 'documents',
             'orderBy'         => 'sort',
             'id'              => 'list',
@@ -60,10 +60,10 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $attr = $db->getRow($query);
 
             if (empty($attr)) {
-                $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
+                $this->module->sendRedirect('attributes', ['error' => $this->lang['common.error.attribute_not_found']]);
             }
 
-            $values = $db->makeArray($db->select('*', $this->tableValues, "`option_id` = '$attr_id'", "`sort` ASC"));
+            $values = $db->makeArray($db->select('*', $this->tableValues, "`attribute_id` = '$attr_id'", "`sort` ASC"));
         } else {
             $attr = [];
             $values = [];
@@ -91,7 +91,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             $attr = $db->getRow($query);
 
             if (empty($attr)) {
-                $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
+                $this->module->sendRedirect('attributes', ['error' => $this->lang['common.error.attribute_not_found']]);
             }
         } else {
             $attr = [];
@@ -172,11 +172,11 @@ class ModuleController extends Commerce\Module\Controllers\Controller
             }
 
             if (!empty($ids)) {
-                $db->delete($this->tableValues, "`option_id` = '" . $attr['id'] . "' AND `id` NOT IN $ids");
+                $db->delete($this->tableValues, "`attribute_id` = '" . $attr['id'] . "' AND `id` NOT IN $ids");
             }
 
             foreach ($insert as $row) {
-                $db->insert(array_merge($row, ['option_id' => $attr['id']]), $this->tableValues);
+                $db->insert(array_merge($row, ['attribute_id' => $attr['id']]), $this->tableValues);
             }
 
             foreach ($update as $id => $row) {
@@ -189,7 +189,7 @@ class ModuleController extends Commerce\Module\Controllers\Controller
 
         $db->query('COMMIT;');
         $this->modx->clearCache('full');
-        $this->module->sendRedirect('options', ['success' => $this->lang['common.attribute_saved']]);
+        $this->module->sendRedirect('attributes', ['success' => $this->lang['common.attribute_saved']]);
     }
 
     public function delete()
@@ -202,15 +202,15 @@ class ModuleController extends Commerce\Module\Controllers\Controller
                 $row = $db->getRow($db->select('*', $this->table, "`id` = '$attr_id'"));
 
                 if (!empty($row)) {
-                    $db->delete($this->tableValues, "`option_id` = '$attr_id'");
+                    $db->delete($this->tableValues, "`attr_id` = '$attr_id'");
                     $db->delete($this->table, "`id` = '$attr_id'");
-                    $this->module->sendRedirect('options', ['success' => $this->lang['common.attribute_deleted']]);
+                    $this->module->sendRedirect('attributes', ['success' => $this->lang['common.attribute_deleted']]);
                 }
             } catch (\Exception $e) {
-                $this->module->sendRedirect('options', ['error' => $e->getMessage()]);
+                $this->module->sendRedirect('attributes', ['error' => $e->getMessage()]);
             }
         }
 
-        $this->module->sendRedirect('options', ['error' => $this->lang['common.error.attribute_not_found']]);
+        $this->module->sendRedirect('attributes', ['error' => $this->lang['common.error.attribute_not_found']]);
     }
 }

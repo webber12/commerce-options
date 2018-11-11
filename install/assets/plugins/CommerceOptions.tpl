@@ -7,7 +7,7 @@
  * @category    plugin
  * @author      mnoskov
  * @version     0.1.0
- * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender,OnDocFormRender,OnDocFormSave,OnManagerBeforeDefaultCurrencyChange,OnDocDuplicate
+ * @internal    @events OnInitializeCommerce,OnBeforeCartItemAdding,OnManagerRegisterCommerceController,OnManagerMenuPrerender,OnDocFormRender,OnDocFormSave,OnManagerBeforeDefaultCurrencyChange,OnDocDuplicate,OnEmptyTrash
  * @internal    @installset base
 */
 
@@ -34,7 +34,12 @@ switch ($e->name) {
     }
 
     case 'OnDocDuplicate': {
-        // TODO
+        // TODO duplicate product options
+        break;
+    }
+
+    case 'OnEmptyTrash': {
+        // TODO delete product options
         break;
     }
 
@@ -53,15 +58,16 @@ switch ($e->name) {
 
     case 'OnManagerRegisterCommerceController': {
         require_once MODX_BASE_PATH . 'assets/plugins/commerceoptions/src/ModuleController.php';
-        $module->registerController('options', new ModuleController($modx, $module));
+        $module->registerController('attributes', new ModuleController($modx, $module));
         break;
     }
 
     case 'OnManagerMenuPrerender': {
         $moduleid = $modx->db->getValue($modx->db->select('id', $modx->getFullTablename('site_modules'), "name = 'Commerce'"));
+        $lang = ci()->optionsProcessor->lexicon->loadLang('common');
         $url = 'index.php?a=112&id=' . $moduleid;
 
-        $params['menu']['commerce_options'] = ['commerce_options', 'commerce', '<i class="fa fa-cog"></i>Опции', $url . '&route=options', 'Опции', '', 'exec_module', 'main', 0, 40, ''];
+        $params['menu']['commerce_attributes'] = ['commerce_attributes', 'commerce', '<i class="fa fa-cog"></i>' . $lang['common.menu_title'], $url . '&route=attributes', $lang['common.menu_title'], '', 'exec_module', 'main', 0, 40, ''];
 
         $e->output(serialize($params['menu']));
         break;

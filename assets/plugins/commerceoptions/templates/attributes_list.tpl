@@ -5,7 +5,7 @@
 <?php $this->endBlock(); ?>
 
 <?php $this->block('buttons'); ?>
-    <a href="<?= $module->makeUrl('options/edit') ?>" class="btn btn-success"><?= $lang['common.add_attribute'] ?></a>
+    <a href="<?= $module->makeUrl('attributes/edit') ?>" class="btn btn-success"><?= $lang['common.add_attribute'] ?></a>
 <?php $this->endBlock(); ?>
 
 <?php $this->block('content'); ?>
@@ -35,11 +35,11 @@
                                 <td style="width: 1%; text-align: center;"><?= $row['id'] ?></td>
                                 <td><?= $row['title'] ?></td>
                                 <td style="white-space: nowrap;">
-                                    <a href="<?= $this->module->makeUrl('options/edit', 'attr_id=' . $row['id']) ?>" class="btn btn-primary btn-sm">
+                                    <a href="<?= $this->module->makeUrl('attributes/edit', 'attr_id=' . $row['id']) ?>" class="btn btn-primary btn-sm">
                                         <?= $lang['common.edit_btn'] ?>
                                     </a>
 
-                                    <a href="<?= $this->module->makeUrl('options/delete', 'attr_id=' . $row['id']) ?>" class="btn btn-danger btn-sm">
+                                    <a href="<?= $this->module->makeUrl('attributes/delete', 'attr_id=' . $row['id']) ?>" class="btn btn-danger btn-sm">
                                         <?= $lang['common.delete_btn'] ?>
                                     </a>
                                 </td>

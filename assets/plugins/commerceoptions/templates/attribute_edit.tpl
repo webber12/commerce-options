@@ -6,7 +6,7 @@
 
 <?php $this->block('buttons'); ?>
     <a href="javascript:;" class="btn btn-success" onclick="document.getElementById('attribute_form').submit();"><?= $_lang['save'] ?></a>
-    <a href="<?= $this->module->makeUrl('options') ?>" class="btn btn-secondary"><?= $_lang['cancel'] ?></a>
+    <a href="<?= $this->module->makeUrl('attributes') ?>" class="btn btn-secondary"><?= $_lang['cancel'] ?></a>
 <?php $this->endBlock(); ?>
 
 <?php $this->block('content'); ?>
@@ -17,7 +17,7 @@
             tpCommerce.addTabPage(document.getElementById('tab_main'));
         </script>
 
-        <form action="<?= $module->makeUrl('options/save') ?>" method="post" id="attribute_form">
+        <form action="<?= $module->makeUrl('attributes/save') ?>" method="post" id="attribute_form">
             <div class="sectionHeader">
                 <?= $lang['common.attribute_data'] ?>
             </div>
