@@ -18,6 +18,11 @@ $tablePlugins    = $modx->getFullTablename('site_plugins');
 $tableEvents     = $modx->getFullTablename('site_plugin_events');
 
 $events = [
+    'OnManagerCommerceAttributesListRender',
+    'OnManagerBeforeCommerceAttributeSaving',
+    'OnManagerCommerceAttributeRender',
+    'OnManagerBeforeCommerceOptionsSaving',
+    'OnManagerBeforeCommerceOptionsRender',
     'OnManagerCommerceOptionsRender',
 ];
 
@@ -39,7 +44,7 @@ foreach ($events as $event) {
 }
 
 $modx->db->query("
-    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_options') . " (
+    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_attributes') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `title` varchar(255) NOT NULL,
         `sort` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -48,14 +53,14 @@ $modx->db->query("
 ");
 
 $modx->db->query("
-    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_option_values') . " (
+    CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_attribute_values') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `option_id` int(10) unsigned NOT NULL,
+        `attribute_id` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
         `image` text NOT NULL,
         `sort` smallint(5) unsigned NOT NULL DEFAULT '0',
         PRIMARY KEY (`id`),
-        KEY `option_id` (`option_id`)
+        KEY `attribute_id` (`attribute_id`)
     ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 ");
 
@@ -65,8 +70,9 @@ $modx->db->query("
         `product_id` int(10) unsigned NOT NULL,
         `code` varchar(32) NOT NULL,
         `title` varchar(255) NOT NULL,
+        `title_locked` tinyint(1) unsigned NOT NULL DEFAULT '0',
         `image` text NOT NULL,
-        `modifier` enum('add','subtract','multiply','equal') NOT NULL DEFAULT 'add',
+        `modifier` enum('add','subtract','multiply','replace') NOT NULL DEFAULT 'add',
         `amount` float NOT NULL DEFAULT '0',
         `count` float unsigned NOT NULL DEFAULT '1',
         `meta` text,
@@ -82,6 +88,7 @@ $modx->db->query("
     CREATE TABLE IF NOT EXISTS " . $modx->getFullTablename('commerce_product_option_values') . " (
         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `option_id` int(10) unsigned NOT NULL,
+        `attribute_id` int(10) unsigned NOT NULL,
         `value_id` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id`),
         KEY `option_id` (`option_id`),
@@ -90,7 +97,7 @@ $modx->db->query("
 ");
 
 // remove installer
-$query = $modx->db->select('id', $tablePlugins, "`name` = 'CommerceOptionsInstall'");
+$query = $modx->db->select('id', $tablePlugins, "`name` = '" . $modx->event->activePlugin . "'");
 
 if ($id = $modx->db->getValue($query)) {
    $modx->db->delete($tablePlugins, "`id` = '$id'");
