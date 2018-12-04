@@ -260,6 +260,8 @@ class CommerceOptions
 
     public function saveForm($params)
     {
+        $modx = ci()->modx;
+        $db = ci()->db;
 
         $docid = $params['id'];
 
@@ -269,9 +271,6 @@ class CommerceOptions
             ci()->modx->invokeEvent('OnManagerBeforeCommerceOptionsSaving', [
                 'data' => &$data,
             ]);
-
-            $modx = ci()->modx;
-            $db = ci()->db;
 
             $db->query("START TRANSACTION;");
 
